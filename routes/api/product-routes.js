@@ -1,15 +1,12 @@
 const router = require('express').Router();
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
-// The `/api/products` endpoint
-
-// get all products
+// GET all products
 router.get('/', async (req, res) => {
-  // find all products
-  // be sure to include its associated Category and Tag data
+  // find all products and include its associated Category and Tag data
   try {
     const productData = await Product.findAll({
-      include: [Category, {model: Tag, through: ProductTag}],
+      include: [Category, { model: Tag, through: ProductTag }],
     })
     res.status(200).json(productData);
   } catch (err) {
@@ -17,32 +14,24 @@ router.get('/', async (req, res) => {
   }
 });
 
-// get one product
+// GET a single product
 router.get('/:id', async (req, res) => {
   const productGet = await Product.findAll({
     product_name: req.body.product_name,
     price: req.body.price,
     stock: req.body.stock,
     category_id: req.body.category_id,
-},
-{
-  where: {
-    id: req.params.id
-  }
-});
-return res.json(productGet);
+  },
+    {
+      where: {
+        id: req.params.id
+      }
+    });
+  return res.json(productGet);
 });
 
-// create new product
+// CREATE a new product
 router.post('/', async (req, res) => {
-  /* req.body should look like this...
-    {
-      product_name: "Basketball",
-      price: 200.00,
-      stock: 3,
-      tagIds: [1, 2, 3, 4]
-    }
-  */
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
@@ -65,9 +54,8 @@ router.post('/', async (req, res) => {
     });
 });
 
-// update product
+// UPDATE a single product
 router.put('/:id', (req, res) => {
-  // update product data
   Product.update(req.body, {
     where: {
       id: req.params.id,
@@ -107,19 +95,23 @@ router.put('/:id', (req, res) => {
     });
 });
 
+// DELETE a single product
 router.delete('/:id', async (req, res) => {
-  const productDestroy = await Product.destroy({
-      product_name: req.body.product_name,
-      price: req.body.price,
-      stock: req.body.stock,
-      category_id: req.body.category_id,
-  },
-  {
-    where: {
-      id: req.params.id
+  try {
+    const productDelete = await Product.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (!productDelete) {
+      res.status(404).json({ message: 'No product with this id in the database!' });
+      return;
     }
-  });
-  return res.json(productDestroy);
+    res.status(200).json(productDelete);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
