@@ -19,8 +19,18 @@ router.get('/', async (req, res) => {
 
 // get one product
 router.get('/:id', async (req, res) => {
-  // find a single product by its `id`
-  // be sure to include its associated Category and Tag data
+  const productGet = await Product.findAll({
+    product_name: req.body.product_name,
+    price: req.body.price,
+    stock: req.body.stock,
+    category_id: req.body.category_id,
+},
+{
+  where: {
+    id: req.params.id
+  }
+});
+return res.json(productGet);
 });
 
 // create new product
@@ -97,8 +107,19 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
-  // delete one product by its `id` value
+router.delete('/:id', async (req, res) => {
+  const productDestroy = await Product.destroy({
+      product_name: req.body.product_name,
+      price: req.body.price,
+      stock: req.body.stock,
+      category_id: req.body.category_id,
+  },
+  {
+    where: {
+      id: req.params.id
+    }
+  });
+  return res.json(productDestroy);
 });
 
 module.exports = router;
