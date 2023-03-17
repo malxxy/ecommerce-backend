@@ -3,7 +3,6 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // GET all products
 router.get('/', async (req, res) => {
-  // find all products and include its associated Category and Tag data
   try {
     const productData = await Product.findAll({
       include: [Category, { model: Tag, through: ProductTag }],
@@ -16,7 +15,7 @@ router.get('/', async (req, res) => {
 
 // GET a single product
 router.get('/:id', async (req, res) => {
-  const productGet = await Product.findAll({
+  const productGet = await Product.findOne({
     product_name: req.body.product_name,
     price: req.body.price,
     stock: req.body.stock,
@@ -31,7 +30,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // CREATE a new product
-router.post('/', async (req, res) => {
+router.post('/', (req, res) => {
   Product.create(req.body)
     .then((product) => {
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
