@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { Tag, Product, ProductTag } = require('../../models');
 
 // GET all tag names and associated product and product tag
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
    Tag.findAll({
     include: [
       {
@@ -18,10 +18,12 @@ router.get('/', async (req, res) => {
 // GET a single tag
 router.get('/:id', async (req, res) => {
   try {
-    const getTag = await Tag.findByPk(req.params.id, {
-      // JOIN with travellers, using the Trip through table
-      include: [{ model: Product, through: ProductTag}]
-    });
+    const getTag = await Tag.findOne(
+      { id: req.params.id },
+      {
+        include: [{ model: Product, through: ProductTag}]
+      }
+    );
 
   if (!getTag) {
     res.status(404).json({ message: 'No tag data found with this id!' });
