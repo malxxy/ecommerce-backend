@@ -21,6 +21,7 @@ router.get('/:id', async (req, res) => {
 
 // CREATE a new category
 router.post('/', async (req, res) => {
+  console.log("category Post: ", req.body)
   const categoryPost = await Category.create(req.body);
   return res.json(categoryPost);
 });
@@ -40,15 +41,21 @@ router.put('/:id', async (req, res) => {
 
 // DELETE a category
 router.delete('/:id', async (req, res) => {
-  const categoryDestroy = await Category.destroy({
-    category_name: req.body.category_name,
-  },
-  {
-    where: {
-      id: req.params.id
+  try {
+    const categoryDestroy = await Category.destroy({
+      where: {
+        id: req.params.id
+      }
+    });
+    
+    if (!categoryDestroy) {
+      res.status(404).json({ message: 'No category with this id in the database!' });
+      return;
     }
-  });
-  return res.json(categoryDestroy);
+    res.status(200).json(categoryDestroy);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;

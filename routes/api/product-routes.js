@@ -29,24 +29,41 @@ router.get('/:id', async (req, res) => {
   return res.json(productGet);
 });
 
-// CREATE a new product
+// CREATE a new product  --> /api/products
 router.post('/', (req, res) => {
+  console.log("Body: ", req.body)
+  console.log("tags: ", req.body.tagIds)
+
   Product.create(req.body)
     .then((product) => {
+      console.log("DB Product: ", product)
       // if there's product tags, we need to create pairings to bulk create in the ProductTag model
-      if (req.body.tagIds.length) {
+    /*  if (req.body.tagIds.length) {
         const productTagIdArr = req.body.tagIds.map((tag_id) => {
           return {
-            product_id: product.id,
+            product_id: product.dataValues.id,
             tag_id,
           };
         });
+        console.log("Product Tags: ", productTagIdArr)
         return ProductTag.bulkCreate(productTagIdArr);
       }
+      */
       // if no product tags, just respond
-      res.status(200).json(product);
+      /*if(!req.body.tagIds) {
+        console.log("No tag Ids found...");
+        res.status(200).json(product);
+      } else {
+        
+        return productTagIdArr
+      }
+      */
+      // if(req.body.tagIds.length == 0) {}
+      const productData = product.dataValues;
+      console.log("datavalues",productData);
+      res.status(200).json(productData);
     })
-    .then((productTagIds) => res.status(200).json(productTagIds))
+  //  .then((productTagIds) => res.status(200).json(productTagIds))
     .catch((err) => {
       console.log(err);
       res.status(400).json(err);
@@ -55,14 +72,21 @@ router.post('/', (req, res) => {
 
 // UPDATE a single product
 router.put('/:id', (req, res) => {
+  console.log("Parameters: ", req.params)
+
   Product.update(req.body, {
     where: {
       id: req.params.id,
     },
   })
-    .then((product) => {
+    .then( async(product) => {
+      console.log("Product: ", product)
       // find all associated tags from ProductTag
-      return ProductTag.findAll({ where: { product_id: req.params.id } });
+      const tags = await  ProductTag.findAll({ where: { product_id: req.params.id } });
+      console.log("Prod Tags: ", tags);
+      const tagData = tags[0].dataValues.product_id;
+      console.log("tagData", tagData)
+      return tagData;
     })
     .then((productTags) => {
       // get list of current tag_ids
