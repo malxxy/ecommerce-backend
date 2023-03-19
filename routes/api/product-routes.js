@@ -72,23 +72,6 @@ router.post('/', (req, res) => {
 
 // UPDATE a single product
 router.put('/:id', async (req, res) => {
-  // console.log("Parameters: ", req.params)
-
-  // Product.update(req.body, {
-  //   where: {
-  //     id: req.params.id,
-  //   },
-  // })
-  //   .then( async(product) => {
-  //     console.log("Product: ", product)
-  //     // find all associated tags from ProductTag
-  //     const tags = await  ProductTag.findAll({ where: { product_id: req.params.id } });
-  //     console.log("Prod Tags: ", tags);
-  //     const tagData = tags[0].dataValues.product_id;
-  //     console.log("tagData", tagData)
-  //     return tagData;
-  //   })
-  //   .then( async (productTags) => {
       const productUpdate = await Product.update({
         product_name: req.body.product_name,
         price: req.body.price,
@@ -101,34 +84,6 @@ router.put('/:id', async (req, res) => {
       });
       return res.json(productUpdate);
     });
-    // .then((productTags) => {
-    //   // get list of current tag_ids
-    //   // const productTagIds = productTags.map(({ tag_id }) => tag_id);
-    //   // // create filtered list of new tag_ids
-    //   // const newProductTags = req.body.tagIds
-    //   //   .filter((tag_id) => !productTagIds.includes(tag_id))
-    //   //   .map((tag_id) => {
-    //   //     return {
-    //   //       product_id: req.params.id,
-    //   //       tag_id,
-    //   //     };
-    //   //   });
-    //   // // figure out which ones to remove
-    //   // const productTagsToRemove = productTags
-    //   //   .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
-    //   //   .map(({ id }) => id);
-
-    //   // run both actions
-    //   return Promise.all([
-    //     ProductTag.destroy({ where: { id: productTags } }),
-    //     ProductTag.update(),
-    //   ]);
-    // })
-    // .then((updatedProductTags) => res.json(updatedProductTags))
-    // .catch((err) => {
-    //   // console.log(err);
-    //   res.status(400).json(err);
-    // });
 
 // DELETE a single product
 router.delete('/:id', async (req, res) => {
